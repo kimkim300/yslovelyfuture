@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌱 예뜨리의 멋진 미래</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌱 예뜨리의 멋진 미래를 향하여!</h1>
+        </header>
+        
+        <div class="calendar-section">
+            <div class="calendar-header">
+                <button id="prevMonth">◀</button>
+                <div class="month-info">
+                    <h2 id="currentMonth">2024년 1월</h2>
+                    <button id="monthStatsBtn" class="stats-btn">📊 월별 통계</button>
+                </div>
+                <button id="nextMonth">▶</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- 달력이 여기에 동적으로 생성됩니다 -->
+            </div>
+        </div>
+        
+        <div class="memo-input">
+            <div class="selected-date">
+                <span id="selectedDateText">오늘</span>의 메모
+            </div>
+            <div class="input-controls">
+                <button id="starButton" class="star-btn" title="중요 메모로 표시">
+                    ☆
+                </button>
+                <div class="memo-input-fields">
+                    <select id="memoCategory" class="category-select">
+                        <option value="">카테고리 선택</option>
+                        <option value="건강">🏃‍♀️ 건강</option>
+                        <option value="경제공부">💰 경제공부</option>
+                        <option value="AI 공부">🤖 AI 공부</option>
+                        <option value="약속">📅 약속</option>
+                        <option value="집안일">🏠 집안일</option>
+                        <option value="기타">📝 기타</option>
+                        <option value="자기개발">🚀 자기개발</option>
+                    </select>
+                    <select id="memoTime" class="time-select">
+                        <option value="">소요 시간 선택</option>
+                        <option value="0">0~30분</option>
+                        <option value="0.5">30분~1시간</option>
+                        <option value="1">1시간~1.5시간</option>
+                        <option value="1.5">1.5시간~2시간</option>
+                        <option value="2">2시간~2.5시간</option>
+                        <option value="2.5">2.5시간~3시간</option>
+                        <option value="3">3시간~3.5시간</option>
+                        <option value="3.5">3.5시간~4시간</option>
+                        <option value="4">4시간 이상</option>
+                    </select>
+                    <textarea id="memoText" placeholder="메모를 입력하세요..."></textarea>
+                </div>
+            </div>
+            <button id="addMemo">추가</button>
+        </div>
+        
+        <div class="memo-list" id="memoList">
+            <!-- 메모들이 여기에 동적으로 추가됩니다 -->
+        </div>
+    </div>
+    
+    <!-- 월별 통계 모달 -->
+    <div class="modal-overlay" id="monthStatsModal">
+        <div class="monthly-stats-modal">
+            <div class="modal-header">
+                <h3 id="modalMonthTitle">2024년 8월 통계</h3>
+                <button class="close-btn" id="closeStatsModal">&times;</button>
+            </div>
+            <div class="stats-content" id="statsContent">
+                <!-- 통계 내용이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
