@@ -1,6 +1,8 @@
 class MemoApp {
     constructor() {
         this.memos = JSON.parse(localStorage.getItem('memos')) || [];
+        this.categories = JSON.parse(localStorage.getItem('categories')) || this.getDefaultCategories();
+        this.headerTitle = localStorage.getItem('headerTitle') || '🥰 오늘도 럭키비키 🍀';
         this.currentEditId = null;
         this.currentDate = new Date();
         this.selectedDate = new Date();
@@ -8,11 +10,25 @@ class MemoApp {
         this.init();
     }
 
+    getDefaultCategories() {
+        return [
+            { name: '건강', emoji: '🏃‍♀️', color: '#28a745' },
+            { name: '경제공부', emoji: '💰', color: '#ffc107' },
+            { name: 'AI 공부', emoji: '🤖', color: '#6f42c1' },
+            { name: '약속', emoji: '📅', color: '#fd7e14' },
+            { name: '집안일', emoji: '🏠', color: '#e83e8c' },
+            { name: '기타', emoji: '📝', color: '#6c757d' },
+            { name: '자기개발', emoji: '🚀', color: '#17a2b8' }
+        ];
+    }
+
     init() {
         this.bindEvents();
+        this.renderHeader();
         this.renderCalendar();
         this.renderMemos();
         this.updateSelectedDateText();
+        this.renderCategories();
     }
 
     bindEvents() {
@@ -23,6 +39,10 @@ class MemoApp {
         const starButton = document.getElementById('starButton');
         const monthStatsBtn = document.getElementById('monthStatsBtn');
         const closeStatsModal = document.getElementById('closeStatsModal');
+        const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
+        const closeCategoryModal = document.getElementById('closeCategoryModal');
+        const addCategoryBtn = document.getElementById('addCategoryBtn');
+        const headerTitle = document.getElementById('headerTitle');
 
         addButton.addEventListener('click', () => this.addMemo());
         memoText.addEventListener('keydown', (e) => {
@@ -36,11 +56,39 @@ class MemoApp {
         starButton.addEventListener('click', () => this.toggleImportance());
         monthStatsBtn.addEventListener('click', () => this.showMonthlyStats());
         closeStatsModal.addEventListener('click', () => this.hideMonthlyStats());
+        manageCategoriesBtn.addEventListener('click', () => this.showCategoryModal());
+        closeCategoryModal.addEventListener('click', () => this.hideCategoryModal());
+        addCategoryBtn.addEventListener('click', () => this.addNewCategory());
+        
+        // 헤더 편집 이벤트
+        if (headerTitle) {
+            // 편집 시작 시 맞춤법 검사 비활성화
+            headerTitle.addEventListener('focus', () => {
+                headerTitle.setAttribute('spellcheck', 'false');
+                headerTitle.setAttribute('autocomplete', 'off');
+                headerTitle.setAttribute('autocorrect', 'off');
+                headerTitle.setAttribute('autocapitalize', 'off');
+            });
+            
+            headerTitle.addEventListener('blur', () => this.saveHeaderTitle());
+            headerTitle.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    headerTitle.blur();
+                }
+            });
+        }
         
         // 모달 외부 클릭 시 닫기
         document.getElementById('monthStatsModal').addEventListener('click', (e) => {
             if (e.target.id === 'monthStatsModal') {
                 this.hideMonthlyStats();
+            }
+        });
+        
+        document.getElementById('categoryModal').addEventListener('click', (e) => {
+            if (e.target.id === 'categoryModal') {
+                this.hideCategoryModal();
             }
         });
     }
@@ -514,16 +562,11 @@ class MemoApp {
             `;
         }
 
-        // 모든 카테고리 정의 (누락된 것 포함)
-        const allCategories = {
-            '건강': '#28a745',
-            '경제공부': '#ffc107',
-            'AI 공부': '#6f42c1',
-            '약속': '#fd7e14',
-            '집안일': '#e83e8c',
-            '기타': '#6c757d',
-            '자기개발': '#17a2b8'
-        };
+        // 동적으로 생성된 카테고리 목록 사용
+        const allCategories = {};
+        this.categories.forEach(category => {
+            allCategories[category.name] = category.color;
+        });
 
         // 원그래프 데이터 생성
         const pieChartData = this.generatePieChartData(stats.categories, allCategories);
@@ -765,6 +808,206 @@ class MemoApp {
 
     bindPieChartEvents() {
         // 호버 기능 제거 - 이벤트 바인딩 없음
+    }
+
+    renderCategories() {
+        const categorySelect = document.getElementById('memoCategory');
+        const categoriesList = document.getElementById('categoriesList');
+        const colorOptions = document.getElementById('colorOptions');
+        
+        // 카테고리 선택 옵션 업데이트
+        categorySelect.innerHTML = '<option value="">카테고리 선택</option>';
+        this.categories.forEach(category => {
+            categorySelect.innerHTML += `
+                <option value="${category.name}">${category.emoji} ${category.name}</option>
+            `;
+        });
+
+        // 카테고리 목록 렌더링
+        if (categoriesList) {
+            categoriesList.innerHTML = '';
+            this.categories.forEach(category => {
+                categoriesList.innerHTML += `
+                    <div class="category-item" data-name="${category.name}">
+                        <span class="category-emoji">${category.emoji}</span>
+                        <span class="category-name">${category.name}</span>
+                        <span class="category-color" style="background-color: ${category.color};"></span>
+                        <button class="edit-category-btn" onclick="memoApp.editCategory('${category.name}')" title="수정">✏️</button>
+                        <button class="delete-category-btn" onclick="memoApp.deleteCategory('${category.name}')" title="삭제">🗑️</button>
+                    </div>
+                `;
+            });
+        }
+
+        // 색상 옵션 렌더링
+        if (colorOptions) {
+            const colors = [
+                '#28a745', '#ffc107', '#6f42c1', '#fd7e14', '#e83e8c', '#6c757d', '#17a2b8',
+                '#dc3545', '#20c997', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'
+            ];
+            
+            colorOptions.innerHTML = '';
+            colors.forEach(color => {
+                colorOptions.innerHTML += `
+                    <div class="color-option" style="background-color: ${color};" 
+                         data-color="${color}" onclick="memoApp.selectColor('${color}')"></div>
+                `;
+            });
+        }
+    }
+
+    showCategoryModal() {
+        const modal = document.getElementById('categoryModal');
+        modal.classList.add('show');
+        this.renderCategories(); // 모달 열릴 때 카테고리 목록 다시 렌더링
+        
+        // 입력 필드 초기화
+        document.getElementById('newCategoryName').value = '';
+        document.getElementById('newCategoryEmoji').value = '';
+        this.selectedColor = '#28a745'; // 기본 색상 설정
+        this.updateColorSelection();
+    }
+
+    hideCategoryModal() {
+        const modal = document.getElementById('categoryModal');
+        modal.classList.remove('show');
+    }
+
+    selectColor(color) {
+        this.selectedColor = color;
+        this.updateColorSelection();
+    }
+
+    updateColorSelection() {
+        const colorOptions = document.querySelectorAll('.color-option');
+        colorOptions.forEach(option => {
+            option.classList.remove('selected');
+            if (option.dataset.color === this.selectedColor) {
+                option.classList.add('selected');
+            }
+        });
+    }
+
+    addNewCategory() {
+        const categoryNameInput = document.getElementById('newCategoryName');
+        const categoryEmojiInput = document.getElementById('newCategoryEmoji');
+
+        const name = categoryNameInput.value.trim();
+        const emoji = categoryEmojiInput.value.trim() || '📝'; // 기본 이모지
+
+        if (!name) {
+            alert('카테고리 이름을 입력해주세요.');
+            return;
+        }
+
+        if (this.categories.some(cat => cat.name === name)) {
+            alert('이미 존재하는 카테고리 이름입니다.');
+            return;
+        }
+
+        // 새 카테고리 추가
+        const newCategory = {
+            name: name,
+            emoji: emoji,
+            color: this.selectedColor || '#28a745'
+        };
+
+        this.categories.push(newCategory);
+        this.saveCategories();
+        this.renderCategories();
+        
+        // 입력 필드 초기화
+        categoryNameInput.value = '';
+        categoryEmojiInput.value = '';
+        
+        // 성공 메시지
+        alert(`"${name}" 카테고리가 추가되었습니다!`);
+    }
+
+    editCategory(name) {
+        const category = this.categories.find(cat => cat.name === name);
+        if (category) {
+            const newName = prompt('새 카테고리 이름을 입력하세요:', category.name);
+            if (newName && newName.trim() && newName !== category.name) {
+                if (this.categories.some(cat => cat.name === newName.trim())) {
+                    alert('이미 존재하는 카테고리 이름입니다.');
+                    return;
+                }
+                
+                // 기존 메모들의 카테고리도 업데이트
+                this.memos.forEach(memo => {
+                    if (memo.category === category.name) {
+                        memo.category = newName.trim();
+                    }
+                });
+                
+                category.name = newName.trim();
+                this.saveCategories();
+                this.saveMemos();
+                this.renderCategories();
+                this.renderMemos();
+                alert('카테고리가 수정되었습니다!');
+            }
+        }
+    }
+
+    updateCategory(name, newName, newEmoji, newColor) {
+        const categoryIndex = this.categories.findIndex(cat => cat.name === name);
+        if (categoryIndex !== -1) {
+            this.categories[categoryIndex].name = newName;
+            this.categories[categoryIndex].emoji = newEmoji;
+            this.categories[categoryIndex].color = newColor;
+            this.saveCategories();
+            this.renderCategories();
+        }
+    }
+
+    deleteCategory(name) {
+        // 해당 카테고리를 사용하는 메모가 있는지 확인
+        const memoCount = this.memos.filter(memo => memo.category === name).length;
+        
+        if (memoCount > 0) {
+            if (!confirm(`"${name}" 카테고리를 사용하는 메모가 ${memoCount}개 있습니다. 정말로 삭제하시겠습니까?`)) {
+                return;
+            }
+            
+            // 해당 카테고리의 메모들을 '기타'로 변경
+            this.memos.forEach(memo => {
+                if (memo.category === name) {
+                    memo.category = '기타';
+                }
+            });
+            this.saveMemos();
+        } else {
+            if (!confirm(`"${name}" 카테고리를 삭제하시겠습니까?`)) {
+                return;
+            }
+        }
+
+        // 카테고리 삭제
+        this.categories = this.categories.filter(cat => cat.name !== name);
+        this.saveCategories();
+        this.renderCategories();
+        this.renderMemos();
+        alert('카테고리가 삭제되었습니다!');
+    }
+
+    saveCategories() {
+        localStorage.setItem('categories', JSON.stringify(this.categories));
+    }
+
+    saveHeaderTitle() {
+        const headerTitle = document.getElementById('headerTitle');
+        if (headerTitle) {
+            localStorage.setItem('headerTitle', headerTitle.textContent);
+        }
+    }
+
+    renderHeader() {
+        const headerTitle = document.getElementById('headerTitle');
+        if (headerTitle) {
+            headerTitle.textContent = this.headerTitle;
+        }
     }
 }
 
