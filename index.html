@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌱 예뜨리의 멋진 미래</title>
+    <title>🌱 ALL IS WELL</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🌱 예뜨리의 멋진 미래를 향하여!</h1>
+            <h1 id="headerTitle" class="editable-header" contenteditable="true" spellcheck="false" title="클릭하여 제목을 수정하세요">🥰 오늘도 럭키비키 🍀</h1>
         </header>
         
         <div class="calendar-section">
@@ -17,7 +17,7 @@
                 <button id="prevMonth">◀</button>
                 <div class="month-info">
                     <h2 id="currentMonth">2024년 1월</h2>
-                    <button id="monthStatsBtn" class="stats-btn">📊 월별 통계</button>
+                    <button id="monthStatsBtn" class="stats-btn">📊 월별 통계 📈</button>
                 </div>
                 <button id="nextMonth">▶</button>
             </div>
@@ -35,16 +35,14 @@
                     ☆
                 </button>
                 <div class="memo-input-fields">
-                    <select id="memoCategory" class="category-select">
-                        <option value="">카테고리 선택</option>
-                        <option value="건강">🏃‍♀️ 건강</option>
-                        <option value="경제공부">💰 경제공부</option>
-                        <option value="AI 공부">🤖 AI 공부</option>
-                        <option value="약속">📅 약속</option>
-                        <option value="집안일">🏠 집안일</option>
-                        <option value="기타">📝 기타</option>
-                        <option value="자기개발">🚀 자기개발</option>
-                    </select>
+                    <div class="category-row">
+                        <select id="memoCategory" class="category-select">
+                            <option value="">카테고리 선택</option>
+                        </select>
+                        <button id="manageCategoriesBtn" class="manage-categories-btn" title="카테고리 관리">
+                            ⚙️
+                        </button>
+                    </div>
                     <select id="memoTime" class="time-select">
                         <option value="">소요 시간 선택</option>
                         <option value="0">0~30분</option>
@@ -60,7 +58,7 @@
                     <textarea id="memoText" placeholder="메모를 입력하세요..."></textarea>
                 </div>
             </div>
-            <button id="addMemo">추가</button>
+            <button id="addMemo">✨ 추가 ✨</button>
         </div>
         
         <div class="memo-list" id="memoList">
@@ -77,6 +75,38 @@
             </div>
             <div class="stats-content" id="statsContent">
                 <!-- 통계 내용이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 카테고리 관리 모달 -->
+    <div class="modal-overlay" id="categoryModal">
+        <div class="category-modal">
+            <div class="modal-header">
+                <h3>⚙️ 카테고리 관리 🎨</h3>
+                <button class="close-btn" id="closeCategoryModal">&times;</button>
+            </div>
+            <div class="category-content">
+                <div class="add-category-section">
+                    <h4>➕ 새 카테고리 추가</h4>
+                    <div class="add-category-form">
+                        <input type="text" id="newCategoryName" placeholder="카테고리 이름" maxlength="20">
+                        <input type="text" id="newCategoryEmoji" placeholder="이모지 (선택사항)" maxlength="5">
+                        <div class="color-picker-section">
+                            <h5>🎨 색상 선택</h5>
+                            <div class="color-options" id="colorOptions">
+                                <!-- 색상 옵션들이 여기에 동적으로 추가됩니다 -->
+                            </div>
+                        </div>
+                        <button id="addCategoryBtn">✨ 추가 ✨</button>
+                    </div>
+                </div>
+                <div class="existing-categories-section">
+                    <h4>📋 기존 카테고리</h4>
+                    <div class="categories-list" id="categoriesList">
+                        <!-- 카테고리들이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
