@@ -4,6 +4,14 @@
     box-sizing: border-box;
 }
 
+/* 전역 맞춤법 검사 비활성화 */
+[contenteditable="true"] {
+    -webkit-spellcheck: false !important;
+    -moz-spellcheck: false !important;
+    -ms-spellcheck: false !important;
+    spellcheck: false !important;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -31,6 +39,63 @@ header h1 {
     font-size: 2.5rem;
     font-weight: 300;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 편집 가능한 헤더 스타일 */
+.editable-header {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 10px;
+    border-radius: 10px;
+    outline: none;
+    /* 맞춤법 검사 밑줄 제거 - 모든 브라우저 지원 */
+    -webkit-spellcheck: false !important;
+    -moz-spellcheck: false !important;
+    -ms-spellcheck: false !important;
+    spellcheck: false !important;
+    /* 추가 맞춤법 검사 비활성화 */
+    -webkit-text-security: none;
+    text-security: none;
+    /* 자동 수정 비활성화 */
+    -webkit-text-size-adjust: none;
+    -moz-text-size-adjust: none;
+    -ms-text-size-adjust: none;
+    text-size-adjust: none;
+}
+
+.editable-header:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.02);
+}
+
+.editable-header:focus {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    transform: scale(1.02);
+}
+
+.editable-header:focus::after {
+    content: " ✏️";
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+/* 편집 중일 때 스타일 */
+.editable-header[contenteditable="true"]:focus {
+    background: rgba(255, 255, 255, 0.25);
+    border: 2px dashed rgba(255, 255, 255, 0.5);
+}
+
+/* 편집 완료 후 저장 표시 */
+.editable-header.saving {
+    background: rgba(40, 167, 69, 0.2);
+    animation: savePulse 0.5s ease-in-out;
+}
+
+@keyframes savePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
 
 .calendar-section {
@@ -727,6 +792,216 @@ header h1 {
     opacity: 0.5;
 }
 
+/* 카테고리 관리 모달 */
+.category-modal {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.category-content {
+    margin-bottom: 20px;
+}
+
+.add-category-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.add-category-section h4 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.add-category-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.add-category-form input {
+    padding: 12px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.add-category-form input:focus {
+    outline: none;
+    border-color: #4facfe;
+    box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+}
+
+.add-category-form button {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.add-category-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+}
+
+.existing-categories-section h4 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.category-item:hover {
+    background: #e9ecef;
+    border-color: #4facfe;
+}
+
+.category-emoji {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.category-name {
+    flex: 1;
+    font-weight: 600;
+    color: #333;
+}
+
+.category-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.edit-category-btn,
+.delete-category-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.edit-category-btn {
+    color: #28a745;
+}
+
+.edit-category-btn:hover {
+    background: rgba(40, 167, 69, 0.1);
+    transform: scale(1.1);
+}
+
+.delete-category-btn {
+    color: #dc3545;
+}
+
+.delete-category-btn:hover {
+    background: rgba(220, 53, 69, 0.1);
+    transform: scale(1.1);
+}
+
+/* 카테고리 입력 행 스타일 */
+.category-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.category-select {
+    flex: 1;
+}
+
+.manage-categories-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.manage-categories-btn:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}
+
+/* 카테고리 색상 선택기 */
+.color-picker-section {
+    margin-top: 10px;
+}
+
+.color-picker-section h5 {
+    color: #495057;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.color-options {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    border-color: #333;
+}
+
+.color-option.selected {
+    border-color: #333;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #333;
+}
+
+/* 반응형 디자인 */
 @media (max-width: 600px) {
     body {
         padding: 10px;
@@ -752,5 +1027,39 @@ header h1 {
     
     .calendar-header h2 {
         font-size: 1.2rem;
+    }
+
+    .category-modal {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    .add-category-form {
+        gap: 8px;
+    }
+    
+    .add-category-form input {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+    
+    .add-category-form button {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+    
+    .category-item {
+        padding: 12px;
+        gap: 8px;
+    }
+    
+    .category-emoji {
+        font-size: 18px;
+    }
+    
+    .edit-category-btn,
+    .delete-category-btn {
+        font-size: 14px;
+        padding: 4px;
     }
 }
